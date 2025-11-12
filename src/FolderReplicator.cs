@@ -34,7 +34,7 @@ Run replication periodically in interval
         TimeSpan interval = syncInterval ?? DefaultSyncInterval;
         //TODO shedullle runner
         Replicate(sourcePath, replicaPath);        
-    }
+    }    
 
     private void Replicate(string sourcePath, string replicaPath)
     {
@@ -43,19 +43,20 @@ Run replication periodically in interval
         string[] destinationFiles = Directory.GetFiles(replicaPath);
         Console.WriteLine("Replica files: " + destinationFiles.Length);
         string[] sourceFiles = Directory.GetFiles(sourcePath);
-        Console.WriteLine("Source files: " + sourceFiles.Length);        
-        
+        Console.WriteLine("Source files: " + sourceFiles.Length);
+
         if ((new DirectoryInfo(replicaPath)).Attributes.HasFlag(FileAttributes.ReadOnly))
         {
-         Console.WriteLine("Replica folder is read-only.");   
-        }        
+            Console.WriteLine("Replica folder is read-only.");
+        }
 
         //Copy each source file
         foreach (string file in sourceFiles)
         {
             try
             {
-                File.Copy(file, replicaPath, overwrite: true);
+                string destinationFile = Path.Combine(replicaPath, Path.GetFileName(file));
+                File.Copy(file, destinationFile, overwrite: true);
             }
             catch (Exception e)
             {
@@ -66,8 +67,14 @@ Run replication periodically in interval
 
         //Cleanup files that are not in source folder
         var filesToDelete = destinationFiles
-           .Where(file => !sourceFiles.Contains(Path.GetFileName(file)));
-        foreach (string file in sourceFiles)
+           .Where(file =>
+           {
+               string filePath = Path.GetFileName(file);
+               bool exists = sourceFiles.Any(path => path.EndsWith(filePath));
+               return !exists; // do NOT delete if exists
+           }).ToList();
+
+        foreach (string file in filesToDelete)
         {
             try
             {
