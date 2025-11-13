@@ -8,4 +8,7 @@ foreach (var arg in args)
 }
 
 FolderReplicator fr = new FolderReplicator();
+string tmpfilePath = FolderReplicator.DefaultReplicaPath + Path.Combine("tmp.txt");
+string tmpContent = "XYZ";
+fr.FileMgr.Create(tmpfilePath, tmpContent);
 fr.ReplicateNow();
