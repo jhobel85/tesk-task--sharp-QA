@@ -7,7 +7,7 @@ public class FolderReplicator : IScheduler
     private readonly string sourcePath;
     private readonly string replicaPath;
 
-    public FolderReplicator(ReplicatorOptions options)
+    public FolderReplicator(IReplicatorOptions options)
     {
         sourcePath = options.SourcePath;
         replicaPath = options.ReplicaPath;

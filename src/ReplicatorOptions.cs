@@ -1,4 +1,4 @@
-public class ReplicatorOptions
+public class ReplicatorOptions : IReplicatorOptions
 {
     public const string PREFIX = "/home/croymen/Veeam/tesk-task--sharp-QA/";
     public const string DefaultLogPath = PREFIX + "logs/app.log";
@@ -11,5 +11,9 @@ public class ReplicatorOptions
     public string ReplicaPath { get; set; } = DefaultReplicaPath;
     public string LogFilePath { get; set; } = DefaultLogPath;    
     public TimeSpan SyncInterval{get; set;}  = DefaultSyncInterval;
-}
 
+    public bool ArgumentsProvided()
+    {
+        return true;//defaults are always used
+    }
+}

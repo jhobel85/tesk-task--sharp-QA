@@ -1,16 +1,17 @@
 ﻿// See https://aka.ms/new-console-template for more information
 Console.WriteLine("App started.");
 
-// Access command-line arguments and print them
-foreach (var arg in args)
+//ReplicatorOptions options = new ReplicatorOptions();
+IReplicatorOptions options = ReplicatorOptionsCmd.Parse(args);
+
+if (!options.ArgumentsProvided())
 {
-    Console.WriteLine($"Argument: {arg}");
+    Console.WriteLine("App exited.");
+    return;
 }
 
-ReplicatorOptions options = new ReplicatorOptions();
-//TODO: fill options
 FolderReplicator replicator = new FolderReplicator(options);
-string tmpfilePath = ReplicatorOptions.DefaultReplicaPath + Path.Combine("tmp.txt");
+string tmpfilePath = options.ReplicaPath + Path.Combine("tmp.txt");
 string tmpContent = "XYZ";
 replicator.FileMgr.Create(tmpfilePath, tmpContent);
 
