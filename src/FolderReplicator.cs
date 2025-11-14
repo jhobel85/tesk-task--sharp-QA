@@ -1,43 +1,20 @@
 using System;
 using Serilog;
 
-public class FolderReplicator
+public class FolderReplicator : IScheduler
 {
-    public const string PREFIX = "/home/croymen/Veeam/tesk-task--sharp-QA/";
-    public const string DefaultLogPath = PREFIX + "logs/app.log";
-    public const string DefaultSourcePath = PREFIX + "data/source/";
-    public const string DefaultReplicaPath = PREFIX + "data/replica/";
-    public static readonly TimeSpan DefaultSyncInterval = TimeSpan.FromSeconds(10);
-
     public FileManager FileMgr { get; private set; }
+    private readonly string sourcePath;
+    private readonly string replicaPath;
 
-    public FolderReplicator(string? logFilePath = null)
+    public FolderReplicator(ReplicatorOptions options)
     {
-        string logPath = logFilePath ?? DefaultLogPath;
-        FileMgr = new FileManager(logPath);
+        sourcePath = options.SourcePath;
+        replicaPath = options.ReplicaPath;
+        FileMgr = new FileManager(options.LogFilePath);
     }
 
-    /*
-Run replication once immediately
-*/
-    public void ReplicateNow(string? sourcePath = null, string? replicaPath = null)
-    {        
-        string srcPath = sourcePath ?? DefaultSourcePath;
-        string rplPath = replicaPath ?? DefaultReplicaPath;
-        Replicate(srcPath, rplPath);
-    }
-    
-    /*
-Run replication periodically in interval
-*/
-    public void Replicate(string sourcePath, string replicaPath, TimeSpan? syncInterval)
-    {        
-        TimeSpan interval = syncInterval ?? DefaultSyncInterval;
-        //TODO shedullle runner
-        Replicate(sourcePath, replicaPath);        
-    }    
-
-    private void Replicate(string sourcePath, string replicaPath)
+    public void Replicate()
     {
         //TODO do it for directories
         //Get the list of files 
@@ -66,4 +43,8 @@ Run replication periodically in interval
         }        
     }
 
+    public void Update()
+    {
+        Replicate();
+    }
 }
