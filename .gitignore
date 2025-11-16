@@ -2,8 +2,8 @@
 logs/*
 
 #Ignore source and replica folder in data/
-data/source
-data/replica
+#data/source
+#data/replica
 
 # Build outputs
 bin/
