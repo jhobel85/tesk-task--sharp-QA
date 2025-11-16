@@ -26,9 +26,11 @@ namespace ReplicaTool.Common
                 if (srcFile.Length != destFile.Length)
                     return false;
 
+/*
+//Comment out to rely only on MD5 hash comparison
                 if (srcFile.LastWriteTimeUtc != destFile.LastWriteTimeUtc)
                     return false;
-
+*/
                 using var md5 = MD5.Create();
                 using var srcStream = File.OpenRead(sourcePath);
                 using var destStram = File.OpenRead(replicaPath);

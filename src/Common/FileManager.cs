@@ -28,6 +28,13 @@ namespace ReplicaTool.Common
         {
             try
             {
+                // Ensure directory exists
+                string? directory = Path.GetDirectoryName(path);
+                if (!string.IsNullOrEmpty(directory))
+                {
+                    CreateDir(directory);
+                }
+
                 File.WriteAllText(path, content);
                 _log.Information($"File created: {path}");
             }
