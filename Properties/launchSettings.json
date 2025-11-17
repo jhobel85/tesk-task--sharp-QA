@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "ReplicaTool": {
+      "commandName": "Project",
+      "commandLineArgs": "--source data/source/ --replica data/replica/ --log logs/app.log --interval 5",
+      "workingDirectory": "$(ProjectDir)"
+    }
+  }
+}

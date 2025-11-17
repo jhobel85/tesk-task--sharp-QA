@@ -5,6 +5,9 @@ logs/*
 data/source
 data/replica
 
-# Build outputs
+#Build outputs
 bin/
 obj/
+
+#Visual Studio
+.vs/

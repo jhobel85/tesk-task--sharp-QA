@@ -81,7 +81,7 @@ namespace ReplicaTool.Common
 
                 if (!_fileComparer.AreFilesEqual(source, destination))
                 {
-                    // perform an async copy so cancellation can interrupt active transfers                    
+                    // perform an async copy with enabled cancellation
                     using (var sourceStream = new FileStream(source, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize, useAsync: true))
                     using (var destStream = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None, BufferSize, useAsync: true))
                     {
