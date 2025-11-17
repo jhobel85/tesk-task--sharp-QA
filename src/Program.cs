@@ -31,8 +31,7 @@ Console.CancelKeyPress += scheduler.OnExit;
 _log.Information("Scheduler started. Press Ctrl+C to exit.");
 
 // Block until exit is requested
-using var waitHandle = new ManualResetEvent(false);
-waitHandle.WaitOne(); 
+scheduler.ExitEvent.WaitOne();
 
 
 

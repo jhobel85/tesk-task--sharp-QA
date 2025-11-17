@@ -8,8 +8,10 @@ namespace ReplicaTool.Services
     public class Scheduler
     {
         private readonly ILogger _log = Logger.CLI_LOGGER;
-
+        
         public static readonly TimeSpan DefaultInterval = TimeSpan.FromSeconds(10);
+
+        public ManualResetEvent ExitEvent = new(false);
 
         private readonly System.Timers.Timer _timer;
 
@@ -56,9 +58,12 @@ namespace ReplicaTool.Services
 
         public void OnExit(object? sender, ConsoleCancelEventArgs e)
         {
+            _log.Information("Exiting...");                       
             _timer.Stop();
-            _timer.Dispose();
+            _timer.Dispose();            
             _cts?.Cancel();
+            e.Cancel = true;
+            ExitEvent.Set();
         }
 
     }
