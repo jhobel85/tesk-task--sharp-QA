@@ -1,8 +1,5 @@
-using System.Security.Cryptography;
-using System.Collections;
 using ReplicaTool.Interfaces;
 using Serilog;
-using System.Data.Common;
 
 namespace ReplicaTool.Common
 {

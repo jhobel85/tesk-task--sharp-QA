@@ -1,7 +1,10 @@
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace ReplicaTool.Interfaces
 {
     public interface IReplicator
     {
-        void Replicate();
+        Task ReplicateAsync(CancellationToken cancellationToken = default);
     }
 }

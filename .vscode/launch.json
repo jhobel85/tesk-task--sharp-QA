@@ -2,20 +2,50 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Build and Launch (WSL)",
+      "name": "Debug App (WSL)",
       "type": "coreclr",
       "request": "launch",
       "program": "${workspaceFolder}/bin/Debug/net8.0/ReplicaTool.dll",
-       "args": [
-        "--source", "data/source/",
-        "--replica", "data/replica/",
-        "--log", "logs/app.log",
-        "--interval", "10",
+      "args": [
+        "--source",
+        "data/source/",
+        "--replica",
+        "data/replica/",
+        "--log",
+        "logs/app.log",
+        "--interval",
+        "5",
       ],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,
       "console": "internalConsole",
-      "preLaunchTask": "build"
+      "justMyCode": false,
+      "preLaunchTask": "build",
+      "logging": {
+        "moduleLoad": true,
+        "programOutput": true,
+        "exceptions": true,
+      },
+    },
+    {
+      "name": "Run Tests (WSL)",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "dotnet",
+      "args": [
+        "test",
+        "${workspaceFolder}/tests/ReplicaTool.Tests.csproj",
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "stopAtEntry": false,
+      "justMyCode": false,
+      "preLaunchTask": "build_test",
+      "logging": {
+        "moduleLoad": true,
+        "programOutput": true,
+        "exceptions": true
+      },
     }
   ]
 }

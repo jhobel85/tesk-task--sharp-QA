@@ -13,4 +13,9 @@
   <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
 </ItemGroup>
 
+  <!-- Exclude test projects/files that may live under the repo root from being compiled into the main project -->
+  <ItemGroup>
+    <Compile Remove="tests\**\*.cs" />
+  </ItemGroup>
+
 </Project>

@@ -3,14 +3,14 @@ using ReplicaTool.Interfaces;
 
 namespace ReplicaTool.Common
 {
-    public class SyncFileManager(string logPath, IFileComparer fileComparer)
+    public class FileManager(string logPath, IFileComparer fileComparer) : IFileManager
     {
         private readonly ILogger _log = Logger.CreateFileAndConsoleLogger(logPath);
         private readonly IFileComparer _fileComparer = fileComparer;
-
-        public void CreateDir(string? destination)
+        public const int BufferSize = 81920;
+        public void CreateDir(string? path)
         {
-            if (string.IsNullOrWhiteSpace(destination))
+            if (string.IsNullOrWhiteSpace(path))
             {
                 _log.Warning("CreateDir called with null or empty destination.");
                 return;
@@ -18,15 +18,15 @@ namespace ReplicaTool.Common
 
             try
             {
-                if (!Directory.Exists(destination))
+                if (!Directory.Exists(path))
                 {
-                    Directory.CreateDirectory(destination);
-                    _log.Information($"Directory created: {destination}");
+                    Directory.CreateDirectory(path);
+                    _log.Information($"Directory created: {path}");
                 }
             }
             catch (Exception ex)
             {
-                _log.Error(ex, $"Failed to create directory: {destination}");
+                _log.Error(ex, $"Failed to create directory: {path}");
             }
         }
 
@@ -59,11 +59,12 @@ namespace ReplicaTool.Common
             }
         }
 
-        public void CopyFile(string source, string destination)
+        public virtual async Task CopyFileAsync(string source, string destination, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (string.IsNullOrWhiteSpace(source) || string.IsNullOrWhiteSpace(destination))
             {
-                _log.Warning($"CopyFile called with null or empty path(s): source='{source}', destination='{destination}'");
+                _log.Warning($"CopyFileAsync called with null or empty path(s): source='{source}', destination='{destination}'");
                 return;
             }
 
@@ -80,9 +81,20 @@ namespace ReplicaTool.Common
 
                 if (!_fileComparer.AreFilesEqual(source, destination))
                 {
-                    File.Copy(source, destination, true);
+                    // perform an async copy so cancellation can interrupt active transfers                    
+                    using (var sourceStream = new FileStream(source, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize, useAsync: true))
+                    using (var destStream = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None, BufferSize, useAsync: true))
+                    {
+                        await sourceStream.CopyToAsync(destStream, BufferSize, cancellationToken).ConfigureAwait(false);
+                    }
+
                     _log.Information($"File copied: {source} → {destination}");
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                _log.Warning($"CopyToAsync canceled: {source} → {destination}");
+                throw;
             }
             catch (Exception ex)
             {
@@ -90,9 +102,9 @@ namespace ReplicaTool.Common
             }
         }
 
-        public void DeleteDir(string source, string destination)
+        public void DeleteDir(string path, bool recursive = true)
         {
-            if (string.IsNullOrWhiteSpace(destination))
+            if (string.IsNullOrWhiteSpace(path))
             {
                 _log.Warning("DeleteDir called with null or empty destination.");
                 return;
@@ -100,27 +112,27 @@ namespace ReplicaTool.Common
 
             try
             {
-                if (!Directory.Exists(source) && Directory.Exists(destination))
+                if (!Directory.Exists(path))
                 {
 
-                    Directory.Delete(destination, true); // delete also non-empty directories 
-                    _log.Warning($"Directory deleted: {destination}");
+                    Directory.Delete(path, recursive); // delete also non-empty directories 
+                    _log.Warning($"Directory deleted: {path}");
                 }
                 else
                 {
-                    _log.Debug($"Skipped deletion: source exists or destination missing. Source='{source}', Destination='{destination}'");
+                    _log.Debug($"Skipped deletion: Directory NOT exists '{path}'");
                 }
 
             }
             catch (Exception ex)
             {
-                _log.Error(ex, $"Failed to delete directory: {destination}");
+                _log.Error(ex, $"Failed to delete directory: {path}");
             }
         }
 
-        public void DeleteFile(string source, string destination)
+        public void DeleteFile(string path)
         {
-            if (string.IsNullOrWhiteSpace(destination))
+            if (string.IsNullOrWhiteSpace(path))
             {
                 _log.Warning("DeleteFile called with null or empty destination.");
                 return;
@@ -128,21 +140,21 @@ namespace ReplicaTool.Common
 
             try
             {
-                if (!File.Exists(source) && File.Exists(destination))
+                if (!File.Exists(path))
                 {
 
-                    File.Delete(destination);
-                    _log.Warning($"File deleted: {destination}");
+                    File.Delete(path);
+                    _log.Warning($"File deleted: {path}");
                 }
                 else
                 {
-                    _log.Debug($"Skipped deletion: source exists or destination missing. Source='{source}', Destination='{destination}'");
+                    _log.Debug($"Skipped deletion: File NOT exists '{path}'");
                 }
 
             }
             catch (Exception ex)
             {
-                _log.Error(ex, $"Failed to delete file: {destination}");
+                _log.Error(ex, $"Failed to delete file: {path}");
             }
         }
 

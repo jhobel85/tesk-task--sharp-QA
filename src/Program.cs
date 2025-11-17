@@ -1,13 +1,11 @@
-﻿using ReplicaTool;
-using ReplicaTool.Interfaces;
-using ReplicaTool.Common;
+﻿using ReplicaTool.Common;
 using ReplicaTool.Configuration;
 using ReplicaTool.Services;
 
 var _log = Logger.CLI_LOGGER;
 _log.Information("App started.");
 
-//var options = new ReplicatorOptions();
+
 var options = ReplicatorOptionsCmd.Parse(args);
 
 if (!options.ArgumentsProvided())
@@ -17,11 +15,8 @@ if (!options.ArgumentsProvided())
 }
 
 var comparer = new Md5FileComparer();
-var fileMgr = new SyncFileManager(options.LogFilePath, comparer);
-FolderReplicator replicator = new FolderReplicator(options, fileMgr);
-string tmpfilePath = Path.Combine(options.ReplicaPath, "tmp.txt");
-string tmpContent = "File is created for test purposes to demonstrate deletion operation in replicat folder.";
-replicator.FileMgr.CreateFile(tmpfilePath, tmpContent);
+var fileMgr = new FileManager(options.LogFilePath, comparer);
+var replicator = new FolderReplicator(options, fileMgr);
 
 var scheduler = new Scheduler(replicator, options.SyncInterval);
 scheduler.Start();

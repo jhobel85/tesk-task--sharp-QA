@@ -8,10 +8,10 @@ namespace ReplicaTool.Configuration
     public class ReplicatorOptionsCmd : IReplicatorOptions
     {
         private readonly ILogger _log = Logger.CLI_LOGGER;
-        public string SourcePath { get; private set; } = "";
-        public string ReplicaPath { get; private set; } = "";
-        public string LogFilePath { get; private set; } = "";
-        public TimeSpan SyncInterval { get; private set; } = TimeSpan.Zero;
+        public string SourcePath { get; set; } = "";
+        public string ReplicaPath { get; set; } = "";
+        public string LogFilePath { get; set; } = "";
+        public TimeSpan SyncInterval { get; set; } = TimeSpan.Zero;
 
         public static ReplicatorOptionsCmd Parse(string[] args)
         {
@@ -49,7 +49,7 @@ namespace ReplicaTool.Configuration
                 _log.Error("Not all arguments were provided.");
                 PrintArguments();
                 _log.Information("Usage: dotnet run --source <path> --replica <path> --log <path> --interval <seconds>");
-                _log.Information("Example: dotnet run --source data/source/ --replica data/replica/ --log logs/app.log --interval 10");
+                _log.Information("Example: dotnet run --source data/source/ --replica data/replica/ --log logs/app.log --interval 5");
             }
             return ret;
         }

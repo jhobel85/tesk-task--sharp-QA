@@ -1,0 +1,8 @@
+{
+  "dotnet.debugging.enableSourceLinkSupport": true,
+  "dotnet.debugging.downloadSymbols": true,
+  "dotnet.debugging.justMyCode": false,  
+  "omnisharp.useGlobalMono": "never",
+  "omnisharp.path": "latest",
+  "omnisharp.loglevel": "info"
+}
