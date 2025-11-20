@@ -8,11 +8,13 @@ namespace ReplicaTool.Common
          Efficiently compares local files by reading and comparing on the fly.
          Exits as soon as a difference is found, which it much faster
          than reading entire files and computing MD5 hashes from it.
+         
+         bufferSize default value set to 80KB buffer for optimal I/O performance, but it can be adjusted if needed.
      */
-    public class ByteByByteComparer : IFileComparer
+    public class ByteByByteComparer(int bufferSize = 81920) : IFileComparer
     {
         private readonly ILogger _log = Logger.CLI_LOGGER;
-        private const int BufferSize = 81920; // 80KB buffer for optimal I/O performance
+        private readonly int _bufferSize = bufferSize; 
 
         public bool AreFilesEqual(string sourcePath, string replicaPath)
         {
@@ -70,17 +72,17 @@ namespace ReplicaTool.Common
         */
         private bool CompareFileContents(string sourcePath, string replicaPath)
         {
-            using var srcStream = new FileStream(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize, FileOptions.SequentialScan);
-            using var destStream = new FileStream(replicaPath, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize, FileOptions.SequentialScan);
+            using var srcStream = new FileStream(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read, _bufferSize, FileOptions.SequentialScan);
+            using var destStream = new FileStream(replicaPath, FileMode.Open, FileAccess.Read, FileShare.Read, _bufferSize, FileOptions.SequentialScan);
             
-            byte[] srcBuffer = new byte[BufferSize];
-            byte[] destBuffer = new byte[BufferSize];
+            byte[] srcBuffer = new byte[_bufferSize];
+            byte[] destBuffer = new byte[_bufferSize];
             
             int srcBytesRead, destBytesRead;
             bool filesAreEqual = true;
-            while (filesAreEqual && (srcBytesRead = srcStream.Read(srcBuffer, 0, BufferSize)) > 0)
+            while (filesAreEqual && (srcBytesRead = srcStream.Read(srcBuffer, 0, _bufferSize)) > 0)
             {
-                destBytesRead = destStream.Read(destBuffer, 0, BufferSize);
+                destBytesRead = destStream.Read(destBuffer, 0, _bufferSize);
                 
                 if (srcBytesRead != destBytesRead)
                 {
