@@ -8,7 +8,7 @@ namespace ReplicaTool.Common
         private readonly ILogger _log = Logger.CreateFileAndConsoleLogger(logPath);
         private readonly IFileComparer _fileComparer = fileComparer;
         public const int BufferSize = 81920;
-        public void CreateDir(string? path)
+        public void CreateDirIfNotExists(string? path)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -30,7 +30,7 @@ namespace ReplicaTool.Common
             }
         }
 
-        public void CreateFile(string path, string content)
+        public void CreateFileIfNotExists(string path, string content)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -41,7 +41,7 @@ namespace ReplicaTool.Common
             try
             {
                 string? directory = Path.GetDirectoryName(path);
-                CreateDir(directory); // Ensure directory exists
+                CreateDirIfNotExists(directory); // Ensure directory exists
 
                 if (!File.Exists(path))
                 {
@@ -77,7 +77,7 @@ namespace ReplicaTool.Common
                 }
 
                 string? destDir = Path.GetDirectoryName(destination);
-                CreateDir(destDir); // Ensure directory exists
+                CreateDirIfNotExists(destDir); // Ensure directory exists
 
                 if (!_fileComparer.AreFilesEqual(source, destination))
                 {

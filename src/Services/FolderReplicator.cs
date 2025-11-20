@@ -18,8 +18,8 @@ namespace ReplicaTool.Services
 
         private void EnsurePathsExist()
         {
-            FileMgr.CreateDir(_sourcePath);
-            FileMgr.CreateDir(_replicaPath);
+            FileMgr.CreateDirIfNotExists(_sourcePath);
+            FileMgr.CreateDirIfNotExists(_replicaPath);
         }
 
         private async Task SyncPathsAsync(CancellationToken cancellationToken = default)
@@ -31,7 +31,7 @@ namespace ReplicaTool.Services
                 cancellationToken.ThrowIfCancellationRequested();
                 string relativePath = Path.GetRelativePath(_sourcePath, sourceDirPath);
                 string destinationDir = Path.Combine(_replicaPath, relativePath);
-                FileMgr.CreateDir(destinationDir);
+                FileMgr.CreateDirIfNotExists(destinationDir);
             }
 
             // Get the list of files in source directory and copy them to replica using bounded concurrency
