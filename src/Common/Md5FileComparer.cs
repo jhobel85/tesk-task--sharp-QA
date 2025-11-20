@@ -19,22 +19,21 @@ namespace ReplicaTool.Common
             {
                 if (File.Exists(replicaPath))
                 {
-                    using var md5 = MD5.Create();
-                    using var srcStream = File.OpenRead(sourcePath);
-                    using var destStream = File.OpenRead(replicaPath);
-
-                    var srcHash = md5.ComputeHash(srcStream);
-                    var destHash = md5.ComputeHash(destStream);
-
-                    // If lengths differ -> safe time by NOT comparing
-                    if (srcHash.Length == destHash.Length)
+                    var srcFileInfo = new FileInfo(sourcePath);
+                    var destFileInfo = new FileInfo(replicaPath);
+                    if (srcFileInfo.Length != destFileInfo.Length)
                     {
-                        ret = srcHash.SequenceEqual(destHash);
-                    }                                        
+                        // Length differ -> files differ, avoid computing hash
+                        return false;
+                    }
+
+                    byte[] srcHash = ComputeHash(sourcePath);
+                    byte[] destHash = ComputeHash(replicaPath);
+                    ret = srcHash.SequenceEqual(destHash);
                 }
                 else
                 {
-                    _log.Debug($"Destination file does not exist: {replicaPath}");
+                    _log.Debug($"ReplicaPath file does not exist: {replicaPath}");
                 }
             }
             catch (FileNotFoundException ex)
@@ -54,6 +53,21 @@ namespace ReplicaTool.Common
             }
             _log.Debug($"Md5FileComparer.AreFilesEqual {ret}: {sourcePath} <-> {replicaPath}");
 
+            return ret;
+        }
+
+        /**
+            Compute MD5 hashe by streaming to avoid high memory consumption.
+            Each file need to have it own MD5 instance.
+        */
+        private byte[] ComputeHash(string filePath)
+        {
+            byte[] ret;
+            using (var md5Src = MD5.Create())
+            using (var srcStream = File.OpenRead(filePath))
+            {
+                ret = md5Src.ComputeHash(srcStream);
+            }
             return ret;
         }
     }
