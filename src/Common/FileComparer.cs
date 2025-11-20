@@ -3,13 +3,14 @@ using Serilog;
 
 namespace ReplicaTool.Common
 {
+    
+/**
+ Basic checks according to file size and timestamp of files.
+*/
     public class FileComparer : IFileComparer
     {
         private readonly ILogger _log = Logger.CLI_LOGGER;
 
-        /**
-         Basic checks according to file size and timestamp of files.
-        */
         public bool AreFilesEqual(string sourcePath, string replicaPath)
         {
             bool ret = false;

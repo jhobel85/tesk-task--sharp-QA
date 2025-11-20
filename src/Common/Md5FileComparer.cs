@@ -4,14 +4,15 @@ using Serilog;
 
 namespace ReplicaTool.Common
 {
+
+/**
+ Check computed MD5 has for better performance especially when 
+ copmaring large files or high valueme of small files. 
+*/
     public class Md5FileComparer : IFileComparer
     {
         private readonly ILogger _log = Logger.CLI_LOGGER;
 
-        /**
-         Check computed MD5 has for better performance especially when 
-         copmaring large files or high valueme of small files. 
-        */
         public bool AreFilesEqual(string sourcePath, string replicaPath)
         {
             bool ret = false;
