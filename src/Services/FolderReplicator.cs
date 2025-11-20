@@ -51,7 +51,11 @@ namespace ReplicaTool.Services
         private void CleanupReplicaDirectories(CancellationToken cancellationToken = default)
         {
             var replicaDirs = Directory.GetDirectories(_replicaPath, "*", SearchOption.AllDirectories);
-            foreach (string replicaDir in replicaDirs)
+            
+            // Ensure child directories are deleted before parents
+            var sortedDirs = replicaDirs.OrderByDescending(GetDirectoryDepth);
+            
+            foreach (string replicaDir in sortedDirs)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 string relativePath = Path.GetRelativePath(_replicaPath, replicaDir);
@@ -78,6 +82,14 @@ namespace ReplicaTool.Services
                     _fileMgr.DeleteFile(replicafile);
                 }
             }
+        }
+
+        private int GetDirectoryDepth(string path)
+        {
+            // Count directory separators to determine nesting depth            
+            int forwardSlashes = path.Count(c => c == Path.DirectorySeparatorChar);
+            int backSlashes = path.Count(c => c == Path.AltDirectorySeparatorChar);
+            return forwardSlashes + backSlashes;
         }
     }
 }
