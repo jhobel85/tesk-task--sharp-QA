@@ -21,7 +21,7 @@ else
     _log.Information($"Sync Interval (seconds): {options.SyncInterval.TotalSeconds}");
 }
 
-var comparer = new ByteByByteComparer();
+var comparer = new AdaptiveFileComparer();
 var fileMgr = new FileManager(options.LogFilePath, comparer);
 var replicator = new FolderReplicator(options, fileMgr);
 var scheduler = new Scheduler(replicator, options.SyncInterval);
